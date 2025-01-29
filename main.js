@@ -15,12 +15,6 @@ const qrcode = require('qrcode-terminal');
 
 app.use(express.json());
 
-// Crear cliente de WhatsApp
-// const client = new Client({
-//     authStrategy: new LocalAuth(),
-//     puppeteer: {headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-extensions']}
-// });
-
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
@@ -44,18 +38,17 @@ client.on('message', async (message) => {
     const body = message.body
     const userName = message._data.notifyName
  
-    // fetch(BACKEND_WEB_HOOK, {
-    //     method: 'POST',
-    //     headers: {
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         phone: phone,
-    //         username: userName,
-    //         message: body
-    //     })
-    // })
-    console.log(body)
+    fetch(BACKEND_WEB_HOOK, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            phone: phone,
+            username: userName,
+            message: body
+        })
+    })
 });
 
 // Ejemplo: Función para enviar mensaje
