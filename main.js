@@ -1,18 +1,18 @@
 // The token is used to avoid that anybody could use the API
-const TOKEN = 'my-secret-token';
+// const TOKEN = 'my-secret-token';
 // Backend where to send the messages 
 // const BACKEND_WEB_HOOK = "https://localhost:7190/api/whatsappweb/get-from-wa"
 
 // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const express = require('express');
-const app = express();
-const port = 3000;
+// const express = require('express');
+// const app = express();
+// const port = 3000;
 
 // const { Client, LocalAuth } = require('whatsapp-web.js');
 // const qrcode = require('qrcode-terminal');
 
-app.use(express.json());
+// app.use(express.json());
 
 // Crear cliente de WhatsApp
 // const client = new Client({
@@ -49,10 +49,10 @@ app.use(express.json());
 // });
 
 // Ejemplo: Función para enviar mensaje
-async function enviarMensaje(numero, mensaje) {
-    const chatId = numero.includes('@c.us') ? numero : `${numero}@c.us`;
-    await client.sendMessage(chatId, mensaje);
-}
+// async function enviarMensaje(numero, mensaje) {
+//     const chatId = numero.includes('@c.us') ? numero : `${numero}@c.us`;
+//     await client.sendMessage(chatId, mensaje);
+// }
 
 // app.post('/send', (req, res) => {
 //     try{
@@ -75,7 +75,81 @@ async function enviarMensaje(numero, mensaje) {
 //     }
 // });
 
-app.get('/', (req, res) => res.status(200).json({ online: true }))
+// app.get('/', (req, res) => res.status(200).json({ online: true }))
 
 // client.initialize();
-app.listen(port, () => console.log(`Server is running`));
+// app.listen(port, () => console.log(`Server is running`));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const express = require('express');
+const { Client } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+
+const app = express();
+const port = 8000;
+
+const client = new Client({
+    puppeteer: {
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    }
+});
+
+client.on('qr', (qr) => {
+    qrcode.generate(qr, { small: true });
+});
+
+client.on('ready', () => {
+    console.log('Client is ready!');
+});
+
+client.on('message', msg => {
+    if (msg.body === 'ping') {
+        msg.reply('pong');
+    }
+});
+
+client.initialize();
+
+app.get('/', (req, res) => {
+    res.send('WhatsApp Web is running!');
+});
+
+app.listen(port, () => {
+    console.log(`App listening at http://localhost:${port}`);
+});
