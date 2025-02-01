@@ -4,11 +4,13 @@ const TOKEN = 'my-secret-token';
 // Backend where to send the messages 
 const BACKEND_WEB_HOOK = "https://localhost:7190/api/whatsappweb/get-from-wa"
 
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+// Port to run the app
+const PORT = 3000;
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const express = require('express');
 const app = express();
-const port = 8000;
 
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
@@ -41,7 +43,8 @@ client.on('message', async (message) => {
     fetch(BACKEND_WEB_HOOK, {
         method: 'POST',
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "authorization": TOKEN
         },
         body: JSON.stringify({
             phone: phone,
@@ -49,6 +52,9 @@ client.on('message', async (message) => {
             message: body
         })
     })
+    .catch(error => console.log("There was an error sending the message: " + error))
+
+    console.log(`Message: ${body}`)
 });
 
 // Ejemplo: Función para enviar mensaje
