@@ -12,7 +12,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const express = require('express');
 const app = express();
 
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth, List } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
 app.use(express.json());
@@ -39,6 +39,10 @@ client.on('message', async (message) => {
     const phone = message?.from.split("@")[0]
     const body = message.body
     const userName = message._data.notifyName
+
+    if (message.type !== 'chat'){
+        return enviarMensaje(phone, 'ESTE TIPO DE MENSJAES AÚN NO ES SOPORTADO: por favor escribe')
+    }
  
     fetch(BACKEND_WEB_HOOK, {
         method: 'POST',
@@ -52,9 +56,10 @@ client.on('message', async (message) => {
             message: body
         })
     })
-    .catch(error => console.log("There was an error sending the message: " + error))
-
-    console.log(`Message: ${body}`)
+    .catch(error => {
+        enviarMensaje(phone, "Lo sentimos actualmente el chatbot se encuentra fuera de servicio")
+        console.log("There was an error sending the message to the backend: " + error)
+    })
 });
 
 // Ejemplo: Función para enviar mensaje
@@ -83,6 +88,28 @@ app.post('/send', (req, res) => {
         return res.status(500).json()
     }
 });
+
+// app.get('/test', (req, res) => {
+//     console.log('1')
+//     const options = new List(
+//         "¿Que deseas ordenar?",
+//         "Ver el menú",
+//         [
+//             {
+//                 title: "Productos",
+//                 rows: [
+//                     { id: "apple", title: "Apple" },
+//                     { id: "mango", title: "Mango" },
+//                     { id: "banana", title: "Banana" },
+//                 ]
+//             }
+//         ],
+//         "Please select a product"
+//     )
+//     console.log('2')
+//     enviarMensaje('50683458718', options)
+//     console.log('3')
+// })
 
 app.get('/', (req, res) => res.status(200).json({ online: true }))
 
